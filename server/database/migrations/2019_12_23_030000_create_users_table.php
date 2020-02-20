@@ -15,8 +15,8 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger("cell_id");
-            $table->unsignedBigInteger("project_id");
+            $table->unsignedBigInteger("cell_id")->nullable();
+            $table->unsignedBigInteger("project_id")->nullable();
             $table->string('name');
             $table->string('surname');
             $table->string('address')->nullable();
@@ -26,9 +26,18 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+        });
 
-            $table->foreign("cell_id")->references("id")->on("cells");
-            $table->foreign("project_id")->references("id")->on("projects");
+        Schema::table("users", function (Blueprint $table)
+        {
+            $table->foreign("cell_id")
+                    ->references("id")
+                    ->on("cells")
+                    ->onDelete("set null");
+            $table->foreign("project_id")
+                    ->references("id")
+                    ->on("projects")
+                    ->onDelete("SET NULL");
         });
     }
 

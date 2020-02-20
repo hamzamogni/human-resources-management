@@ -20,7 +20,8 @@ class TableCellAddChiefIdColumn extends Migration
 
             $table->foreign("chief_id")
                 ->references("id")
-                ->on("cells");
+                ->on("cells")
+                ->onDelete("set null");
         });
     }
 

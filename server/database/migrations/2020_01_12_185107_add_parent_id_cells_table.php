@@ -20,7 +20,8 @@ class AddParentIdCellsTable extends Migration
 
             $table->foreign("parent_id")
                 ->references("id")
-                ->on("cells");
+                ->on("cells")
+                ->onDelete("cascade");
         });
     }
 
