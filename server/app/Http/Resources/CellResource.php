@@ -23,6 +23,7 @@ class CellResource extends JsonResource
             'chief' => $this->chief,
             'children' => CellResource::collection($this->children),
             'count_users' => $this->users->count(),
+            "isSubcell" => $this->isSubcell
         ];
 
         // if($this->chief == null)
