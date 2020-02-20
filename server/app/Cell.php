@@ -29,4 +29,9 @@ class Cell extends Model
     {
         return $this->chief != null;
     }
+
+    public function getIsSubcellAttribute()
+    {
+        return $this->parent != null;
+    }
 }
