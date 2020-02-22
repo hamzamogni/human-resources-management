@@ -72,7 +72,6 @@ class CellController extends Controller
     public function destroy($id)
     {
         $cell = Cell::findOrFail($id);
-        //$cell->children()->delete();
         $cell->delete();
         return Response("done");
     }
