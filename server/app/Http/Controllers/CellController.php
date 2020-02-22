@@ -33,7 +33,11 @@ class CellController extends Controller
      */
     public function store(Request $request)
     {
-        Cell::create($request->all());
+        return $request;
+        $cell = new Cell($request->except(["isSubcell", "parent_id"]));
+        // if($request->isSubcell)
+        
+        
     }
 
     /**
@@ -65,9 +69,12 @@ class CellController extends Controller
      * @param \App\Cell $cell
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Cell $cell)
+    public function destroy($id)
     {
-        //
+        $cell = Cell::findOrFail($id);
+        //$cell->children()->delete();
+        $cell->delete();
+        return Response("done");
     }
 
     public function update_chief(Request $request, $id)
