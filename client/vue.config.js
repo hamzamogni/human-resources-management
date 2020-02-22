@@ -2,5 +2,7 @@ module.exports = {
   "transpileDependencies": [
     "vuetify"
   ],
-  lintOnSave: false
+  lintOnSave: false,
+  outputDir: "../server/public/",
+  indexPath: '../resources/views/index.blade.php'
 }
