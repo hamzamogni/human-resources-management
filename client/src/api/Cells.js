@@ -13,10 +13,21 @@ export default {
                 .get("/api/cells/" + id);
     },
 
-    async addCell(cell_data) {
+    async addCell(data) {
         return await
             Api()
-                .post("/api/cells", {...cell_data});
+                .post("/api/cells", {
+                    "name": data.cell_name,
+                    "description": data.cell_description,
+                    "isSubcell": data.isSubcell,
+                    "parent_id": data.parent_id
+                });
+    },
+
+    async deleteCell(data) {
+        return await 
+            Api()
+                .delete("/api/cells/" + data.cell_id)
     },
 
     async updateChief(data) {
