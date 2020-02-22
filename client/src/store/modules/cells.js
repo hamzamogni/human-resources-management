@@ -30,15 +30,21 @@ const actions = {
         Cells.getCells().then(
             resp => {
                 commit("GET_CELLS", resp.data);
-
             }
         )
     },
 
-    ADD_CELL({ commit }, cell_data) {
-        Cells.addCell(cell_data).then(
-            resp => console.log(resp)
-        )
+    ADD_CELL({ commit, dispatch }, data) {
+        Cells.addCell(data)
+            .then( (resp) => {
+                console.log(resp)
+                dispatch("GET_CELLS")
+            })
+    },
+
+    DELETE_CELL({ commit, dispatch }, data) {
+        Cells.deleteCell(data)
+            .then( () => dispatch("GET_CELLS") )
     },
 
     UPDATE_CHIEF({ commit }, data) {
