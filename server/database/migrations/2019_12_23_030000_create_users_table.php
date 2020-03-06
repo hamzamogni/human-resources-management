@@ -17,7 +17,6 @@ class CreateUsersTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger("cell_id")->nullable();
             $table->boolean("chief")->default(0);
-            // $table->unsignedBigInteger("chief_of_cell")->nullable();
             $table->unsignedBigInteger("project_id")->nullable();
             $table->string('name');
             $table->string('surname');
@@ -36,12 +35,7 @@ class CreateUsersTable extends Migration
                     ->references("id")
                     ->on("cells")
                     ->onDelete("set null");
-
-            // $table->foreign("chief_of_cell")
-            //         ->references("id")
-            //         ->on("cells")
-            //         ->onDelete("SET NULL");
-                    
+                         
             $table->foreign("project_id")
                     ->references("id")
                     ->on("projects")
