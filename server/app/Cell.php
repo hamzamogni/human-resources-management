@@ -3,18 +3,27 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\User;
 
 class Cell extends Model
 {
     protected $guarded = ["id"];
+
+    protected $appends = ['chief'];
+
     public function users()
     {
         return $this->hasMany('App\User');
     }
 
-    public function chief()
+    public function meetings()
     {
-        return $this->belongsTo("App\User", "chief_id");
+        return $this->hasMany("App\Meeting");
+    }
+
+    public function getChiefAttribute()
+    {
+        return $this->users()->where("chief", 1);
     }
 
     public function parent() {
@@ -27,11 +36,31 @@ class Cell extends Model
 
     public function getHasChiefAttribute()
     {
-        return $this->chief != null;
+        return $this->chief->count() == 1;
     }
 
     public function getIsSubcellAttribute()
     {
         return $this->parent != null;
+    }
+
+    public function assignChief($id)
+    {
+        $user = User::findOrFail($id);
+        if ($this->has_chief && $this->chief->get()->first()->id === $id)
+            return "already chief";
+        else 
+        {
+            $this->removeChief();
+            $user->makeChief();
+            return "done";
+        }
+            
+    }
+
+    public function removeChief()
+    {
+        if ($this->has_chief)
+            $this->chief->get()->first()->makeNotChief();
     }
 }
