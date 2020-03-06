@@ -18,9 +18,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post("cells/{id}/update_chief", "CellController@update_chief");
 Route::post("cells/{id}/delete_chief", "CellController@delete_chief");
+Route::post("cells/{id}/add_member", "CellController@add_member");
+Route::post("cells/{id}/delete_member", "CellController@delete_member");
 
 Route::apiResources([
     'users' => "UserController",
     "posts" => "PostController",
-    "cells" => "CellController"
+    "cells" => "CellController",
+    "meetings" => "MeetingController"
 ]);
