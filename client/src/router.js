@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import Home from "./views/Home";
 import Members from "./views/Members";
 import Cells from "./views/Cells";
+import Meetings from "./views/Meetings";
 
 const router =  new VueRouter({
     mode: 'history',
@@ -18,6 +19,10 @@ const router =  new VueRouter({
         {
             path: '/cells',
             component: Cells,
+        },
+        {
+            path: "/meetings",
+            component: Meetings
         }
     ]
 });
