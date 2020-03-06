@@ -20,7 +20,7 @@ class CellResource extends JsonResource
             'description' => $this->description,
             'users' => $this->users,
             'hasChief' => $this->hasChief,
-            'chief' => $this->chief,
+            'chief' => new UserResource($this->chief->get()->first()),
             'children' => CellResource::collection($this->children),
             'count_users' => $this->users->count(),
             "isSubcell" => $this->isSubcell
