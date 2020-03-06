@@ -1,7 +1,7 @@
 import Members from "../../api/Members";
 
 const state = {
-    members: {},
+    members: [],
 
     members_headers: [
         {
@@ -28,6 +28,14 @@ const getters = {
 const mutations = {
     GET_MEMBERS(state, members) {
         state.members = members;
+    },
+
+    ADD_USER(state, member) {
+        state.members.push(member);
+    },
+
+    DELETE_USER(state, member) {
+        // state.members.splice()
     }
 };
 
@@ -39,6 +47,24 @@ const actions = {
             }
         )
     },
+
+    ADD_USER({commit}, data) {
+        Members.addMember(data).then(
+            resp => commit("ADD_USER", resp.data)
+        )
+    },
+
+    EDIT_USER({commit, dispatch}, data) {
+        Members.editUser(data).then(
+            resp => dispatch("GET_MEMBERS")
+        )
+    },
+
+    DELETE_USER({commit, dispatch}, data) {
+        Members.deleteUser(data).then(
+            resp => dispatch("GET_MEMBERS")
+        )
+    }
 };
 
 export default {state, getters, mutations, actions}
