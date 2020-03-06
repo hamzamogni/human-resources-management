@@ -36,7 +36,7 @@ const actions = {
 
     ADD_CELL({ commit, dispatch }, data) {
         Cells.addCell(data)
-            .then( (resp) => {
+            .then((resp) => {
                 console.log(resp)
                 dispatch("GET_CELLS")
             })
@@ -44,7 +44,7 @@ const actions = {
 
     DELETE_CELL({ commit, dispatch }, data) {
         Cells.deleteCell(data)
-            .then( () => dispatch("GET_CELLS") )
+            .then(() => dispatch("GET_CELLS"))
     },
 
     UPDATE_CHIEF({ commit }, data) {
@@ -55,7 +55,22 @@ const actions = {
 
     DELETE_CHIEF({ commit }, data) {
         Cells.deleteChief(data).then(
-            resp => commit("UPDATE_CELL", resp.data)
+            resp => {
+                console.log(resp.data)
+                commit("UPDATE_CELL", resp.data)
+            }
+        )
+    },
+
+    ADD_MEMBER({ commit, dispatch }, data) {
+        Cells.addMember(data).then(
+            resp => dispatch("GET_CELLS")
+        )
+    },
+
+    DELETE_MEMBER({ commit, dispatch }, data) {
+        Cells.deleteMember(data).then(
+            resp => dispatch("GET_CELLS")
         )
     }
 };
@@ -74,10 +89,10 @@ const mutations = {
                 for (let idx_children in state.cells[cell].children) {
                     console.log(state.cells[cell].children[idx_children].id)
                     if (state.cells[cell].children[idx_children].id == updt_cell.id) {
-                        Object.assign(state.cells[cell].children[idx_children], updt_cell);               
+                        Object.assign(state.cells[cell].children[idx_children], updt_cell);
                         return;
                     }
-                        
+
                 }
             }
         }
