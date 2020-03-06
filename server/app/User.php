@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'surname', 'email', 'password',
     ];
 
     /**
@@ -56,4 +56,20 @@ class User extends Authenticatable
         return $this->name . " " . $this->surname;
     }
 
+    public function setIsChiefAttribute($val)
+    {
+        $this->attributes["chief"] = $val;
+    }
+
+    public function makeNotChief()
+    {
+        $this->is_chief = false;
+        $this->save();
+    }
+
+    public function makeChief()
+    {
+        $this->is_chief = true;
+        $this->save();
+    }
 }
