@@ -47,16 +47,18 @@
         data: () => ({
             drawer: null,
 
-            cell_data: {
-                name: 'hamza',
-                description: "kjqdhfksjdhfskjdhf",
-            },
-
             drawer_data: [
                 {icon: "mdi-home", text: "Home", route: "/"},
                 {icon: "mdi-contact-mail", text: "Members", route: "/members"},
-                {icon: "mdi-account-group-outline", text: "Cells", route: "/cells"},
+                {icon: "mdi-account-multiple", text: "Cells", route: "/cells"},
+                {icon: "mdi-account-group", text: "Meetings", route: "/meetings"}
             ]
         }),
+
+        beforeCreate() {
+            this.$store.dispatch("GET_CELLS");
+            this.$store.dispatch("GET_MEMBERS");
+            this.$store.dispatch("GET_MEETINGS");
+        }
     }
 </script>
