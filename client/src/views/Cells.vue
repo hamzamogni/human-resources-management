@@ -3,7 +3,7 @@
     <v-card-title class="headline">
       Cells Management
       <v-spacer></v-spacer>
-      <v-btn class="indigo" dark>Add a Cell</v-btn>
+      <v-btn class="indigo" dark @click="isAddingCell=true">Add a Cell</v-btn>
     </v-card-title>
     <v-divider></v-divider>
     <v-row class="pa-4" justify="space-between">
@@ -16,22 +16,82 @@
           activatable
           color="warning"
           transition
+          hoverable
         >
-          <template v-slot:prepend="{ item, active }">
-            <v-icon>mdi-account-group</v-icon>
+          <template v-slot:append="{ item }">
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  :cell_id="item.id"
+                  v-if="!item.isSubcell"
+                  v-on="on"
+                  @click.stop="parent_cell=item.id; isAddingCell=true"
+                  icon
+                  fab
+                  small
+                >
+                  <v-icon>mdi-plus</v-icon>
+                </v-btn>
+              </template>
+              <span>Add Sub-Cell</span>
+            </v-tooltip>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-btn v-on="on" @click.stop="deleteCell(item)" icon fab small>
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+              </template>
+              <span>Add Sub-Cell</span>
+            </v-tooltip>
           </template>
         </v-treeview>
       </v-col>
 
       <v-divider vertical></v-divider>
 
-      <v-col class="d-flex">
+      <v-col class>
         <v-scroll-y-transition mode="out-in">
+          <v-card v-if="isAddingCell" width="100%">
+            <v-card-title>Add a new cell</v-card-title>
+            <v-card-text>
+              <v-form ref="form">
+                <v-container>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="addCellForm.cellName"
+                        :rules="addCellForm.nameRules"
+                        label="Cell name"
+                        required
+                        outlined
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-textarea
+                        v-model="addCellForm.cellDescription"
+                        :rules="addCellForm.descriptionRules"
+                        label="Description"
+                        required
+                        outlined
+                      ></v-textarea>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-form>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn @click="addNewCell" text x-large color="success">Done</v-btn>
+              <v-btn @click="isAddingCell=false; defaultState;" text x-large color="indigo">Cancel</v-btn>
+            </v-card-actions>
+          </v-card>
+
           <div
-            v-if="!selected"
+            v-else-if="!selected"
             class="title grey--text text--lighten-1 font-weight-light"
             style="align-self: center;"
           >Select a Cell</div>
+
           <v-card v-else :key="selected.id" class="pt-6 mx-auto" flat max-width="500">
             <v-card-text class="text-center">
               <h3 class="title font-weight-bold black--text mb-2">{{ selected.name }}</h3>
@@ -39,7 +99,7 @@
                 <v-avatar v-if="avatar" size="88">
                   <v-img :src="`https://avataaars.io/${avatar}`" class="mb-6"></v-img>
                 </v-avatar>
-                <h3>{{ selected.chief.full_name }}</h3>
+                <h3>{{ selected.chief.fullname }}</h3>
                 <div class="blue--text mb-2">{{ selected.chief.email }}</div>
 
                 <v-tooltip bottom>
@@ -103,9 +163,9 @@
                   <v-card-text class="pb-0">
                     <v-autocomplete
                       v-model="assignedChief"
-                      :items="members"
+                      :items="selected.users"
                       color="white"
-                      item-text="fullname"
+                      item-text="full_name"
                       item-value="id"
                       label="Choose a Chief"
                       outlined
@@ -122,7 +182,35 @@
             <v-divider></v-divider>
             <h3 class="my-2">Description</h3>
             <div class="body-1">{{selected.description}}</div>
-            <h3 class="my-2">Members</h3>
+
+              <h3 class="my-2">Members</h3>
+
+            <v-row class="mx-2 mb-2">
+              <v-spacer></v-spacer>
+              <v-btn color="indigo" dark @click="isAddingMember = true">Add Member</v-btn>
+            </v-row>
+
+            <v-expand-transition>
+                <v-card outlined class="my-2" v-if="isAddingMember">
+                  <v-card-text class="pb-0">
+                    <v-autocomplete
+                      v-model="memberToAdd"
+                      :items="members"
+                      color="white"
+                      item-text="fullname"
+                      item-value="id"
+                      label="Choose a Chief"
+                      outlined
+                      clearable
+                    ></v-autocomplete>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn :disabled="!memberToAdd" @click="addMember" text color="indigo">Done</v-btn>
+                    <v-btn text @click="isAddingMember = false">Cancel</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-expand-transition>
 
             <v-card outlined>
               <v-card-title>
@@ -143,7 +231,7 @@
                 disable-pagination
               >
                 <template v-slot:item.action="{ item }">
-                  <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
+                  <v-icon small @click="deleteMember(item)">mdi-delete</v-icon>
                 </template>
               </v-data-table>
             </v-card>
@@ -174,7 +262,21 @@ export default {
 
     isDeletingChief: false,
     isAssigningChief: false,
+    isAddingCell: false,
+    isAddingSubcell: false,
+    isAddingMember: false,
     assignedChief: null,
+    memberToAdd: null,
+
+    addCellForm: {
+      cellName: "",
+      cellDescription: "",
+
+      nameRules: [v => !!v || "Cell Name is required"],
+
+      descriptionRules: [v => !!v || "Cell Description is required"]
+    },
+    parent_cell: null,
 
     members_table: {
       headers: [
@@ -199,7 +301,7 @@ export default {
       if (!this.active.length) return undefined;
 
       const id = this.active[0];
-      if (!!this.cells.find(item => item.id === id))
+      if (this.cells.find(item => item.id === id))
         return this.cells.find(item => item.id === id);
       else {
         for (let cell in this.cells) {
@@ -236,15 +338,60 @@ export default {
       this.$store.dispatch("DELETE_CHIEF", this.selected.id);
     },
 
+    addMember() { 
+      this.$store.dispatch("ADD_MEMBER", {
+        cellID: this.selected.id,
+        memberID: this.memberToAdd
+      }).then(() => this.isAddingMember = false)
+    },
+
+    deleteMember(item) { 
+      console.log(item)
+      this.$store.dispatch("DELETE_MEMBER", {
+        cellID: this.selected.id,
+        memberID: item.id
+      })
+    },
+
+    addNewCell() {
+      if (this.$refs.form.validate()) {
+        if (this.parent_cell) {
+          this.$store
+            .dispatch("ADD_CELL", {
+              cell_name: this.addCellForm.cellName,
+              cell_description: this.addCellForm.cellDescription,
+              isSubcell: true,
+              parent_id: this.parent_cell
+            })
+            .then(() => this.defaultState());
+        } else {
+          this.$store
+            .dispatch("ADD_CELL", {
+              cell_name: this.addCellForm.cellName,
+              cell_description: this.addCellForm.cellDescription,
+              isSubcell: false,
+              parent_id: ""
+            })
+            .then(() => this.defaultState());
+        }
+      }
+    },
+
+    deleteCell(item) {
+      if (confirm("Are you sure you want to delete this cell ?"))
+        this.$store.dispatch("DELETE_CELL", { cell_id: item.id });
+    },
+
     defaultState() {
       this.isAssigningChief = false;
       this.isDeletingChief = false;
+      this.isAddingCell = false;
+      this.isAddingSubcell = false;
+      this.parent_cell = null;
     }
   },
 
   mounted: function() {
-    this.$store.dispatch("GET_CELLS");
-    this.$store.dispatch("GET_MEMBERS");
     this.randomAvatar();
   }
 };
