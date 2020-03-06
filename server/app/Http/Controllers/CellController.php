@@ -33,9 +33,20 @@ class CellController extends Controller
      */
     public function store(Request $request)
     {
-        return $request;
         $cell = new Cell($request->except(["isSubcell", "parent_id"]));
-        // if($request->isSubcell)
+
+        if($request->isSubcell)
+        {
+            $parent = Cell::findOrFail($request->parent_id);
+            $cell->parent()->associate($parent);
+            $cell->save();
+            return Response("done");
+        }
+        else 
+        {
+            $cell->save();
+            return Response("done");
+        }
         
         
     }
@@ -72,6 +83,7 @@ class CellController extends Controller
     public function destroy($id)
     {
         $cell = Cell::findOrFail($id);
+        $cell->removeChief();
         $cell->delete();
         return Response("done");
     }
@@ -79,17 +91,34 @@ class CellController extends Controller
     public function update_chief(Request $request, $id)
     {
         $cell = Cell::findOrFail($id);
-        $user = User::findOrFail($request->chief_id);
-        $cell->chief()->associate($user);
-        $cell->save();
-        return Response(new CellResource($cell));
+        $cell->assignChief($request->chief_id);
+        return Response(new CellResource(Cell::findOrFail($id)));
     }
 
     public function delete_chief($id)
     {
         $cell = Cell::findOrFail($id);
-        $cell->chief()->dissociate();
-        $cell->save();
+        $cell->removeChief();
+        return Response(new CellResource(Cell::findOrFail($id)));
+    }
+
+    public function add_member(Request $request, $cellID)
+    {
+        $cell = Cell::findOrFail($cellID);
+        $member = User::findOrFail($request->member_id);
+        $member->makeNotChief();
+        $member->cell()->associate($cell);
+        $member->save();
+        return Response(new CellResource($cell));
+    }
+
+    public function delete_member(Request $request, $cellID)
+    {
+        $cell = Cell::findOrFail($cellID);
+        $member = User::findOrFail($request->member_id);
+        $member->makeNotchief();
+        $member->cell()->dissociate($cell);
+        $member->save();
         return Response(new CellResource($cell));
     }
 }
