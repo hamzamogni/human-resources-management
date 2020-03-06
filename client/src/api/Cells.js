@@ -42,5 +42,21 @@ export default {
         return await 
             Api()
                 .post("/api/cells/" + id + "/delete_chief")
+    },
+
+    async addMember(data) {
+        return await
+            Api()
+                .post("/api/cells/" + data.cellID + "/add_member", {
+                    "member_id": data.memberID
+                })
+    },
+
+    async deleteMember(data) {
+        return await
+            Api()
+                .post("/api/cells/" + data.cellID + "/delete_member", {
+                    "member_id": data.memberID
+                })
     }
 }
